@@ -46,8 +46,8 @@
                     </div>
                 </div>
                 <div class="panel-footer">
-                    <button type="submit" class="btn btn-default">Submit</button>
-                    <button type="reset" class="btn btn-default">Reset</button>
+                    <button type="submit" class="btn btn-default"><i class="fa fa-save"></i></button>
+                    <button type="reset" class="btn btn-default"><i class="fa fa-undo"></i></button>
                 </div>
             </div>
         </form>

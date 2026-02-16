@@ -30,8 +30,8 @@
                                     <div class="col-lg-6">
                                         <input style="width:100px;" type="text" data-inputmask="'mask': '[99-9999]'" class="form-control dpM" placeholder="Periode" name="period" id="period" value="<?=date('m-Y')?>">
                                     </div>
-                                    <div class="col-lg-2" style="margin-left:-15px;">
-                                        <button id="btn-submit" class="btn btn-success" style="width:120px;margin-left:10px;">Submit</button>
+                                    <div class="col-lg-4" style="margin-left:5px;">
+                                        <button id="btn-submit" class="btn btn-default" style="width:50px;margin-left:10px;"><i class="fa fa-play"></i></button>
                                     </div>    
                                 </div>        
                             </div>

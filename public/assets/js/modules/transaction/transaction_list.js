@@ -11,16 +11,9 @@ $("#btn-submit").on('click', function (e) {
 
 function fetch_data(){
     t = $('#mainTable').DataTable({
-        paging:true,
-        ordering:false,
-        info: false,
-        responsive: true,
-        scrollY: true,
-        scrollX: true,
-        scrollCollapse: true,
-        lengthChange: false,
-        dom: '<"top"i>rt<"bottom"flp><"clear">',
-        lengthMenu: [[3, 5, -1], [3, 5, 'All']],
+        responsive:true,
+        dom: 'lfrtip',
+        lengthMenu: [[5, 10, -1], [5, 10, 'All']],
         ajax: {
             url: baseUrl + 'transaction/transaction_list/getdata',
             type: 'POST',
@@ -40,44 +33,31 @@ function fetch_data(){
             {data: 'total',  width: "10%", render: function (data, type, row, meta) {
                 return formatRupiah(data)
             }},
-
-            {data: 'status_name',  width: "15%", render: function (data, type, row, meta) {
+            {data: 'status_name',  width: "10%", render: function (data, type, row, meta) {
+                return data;
+            }},
+            {data: 'description', width: "25%", render: function (data, type, row, meta) {                    
                 return data;
             }},
             {data: 'created', width: "15%", render: function (data, type, row, meta) {                    
                 return data;
             }},
-            {data: 'createdby_name', width: "25%", render: function (data, type, row, meta) {                    
+            {data: 'createdby_name', width: "15%", render: function (data, type, row, meta) {                    
                 return data;
             }},
-            {data: 'id', width: "10%", orderable: false, render: function (data, type, row, meta) {
-                    return '<a title="Select" href="#" class="btn btn-danger btn-block btn-xs"><strong style="font-weight:bold;font-size:13px;">Select</strong></a>';
+            {data: 'id', width: "5%", orderable: false, render: function (data, type, row, meta) {
+                    return '<a title="Select" href="#" class="btn btn-default btn-sm"><i class="fa fa-eye"></i></a>';
                 }
             },
         ],           
         order: [[1, 'asc']],
-        initComplete: function() {
-            var table = $('#mainTable').DataTable();
-            var table_length = table.data().count();
-            if(Number(table_length) <= 0){   
-                $('#mainTable_filter').hide();
-                $('#mainTable_paginate').hide();
-                $("#btn-confirm").hide();
-                $("#btn-cancel").show();
-                reset_form_input();            
-            }
-            if(Number(table_length) <= 3){   
-                $('#mainTable_filter').hide();
-                $('#mainTable_paginate').hide();                    
-            }
-        }
     });
 
     $('#mainTable').on('click', 'a[title^=Select]', function (e) {
         e.preventDefault();
         var elm = $(this).closest("tr");
         var d = t.row(elm).data();
-        url = call_page_task(d.id);
+        url = baseUrl + "transaction/transaction/index/"+d.id;
         if(url !== ''){
             $.ajax({
                 url: url,

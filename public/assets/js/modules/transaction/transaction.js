@@ -1,4 +1,4 @@
-back_to_page_ini();
+back_to_this_page();
 
 $('#product_id').on('change',function(){
     if($(this).val() != null && $(this).val() != ''){
@@ -41,10 +41,11 @@ function reset_form_input(){
     $("#btn-add-detail").focus();
 }
 
-function back_to_page_ini(){ 
+function back_to_this_page(){ 
     $("#ftitle").html('New');
     $("#btn-confirm").hide();
     $("#btn-cancel").hide();
+    $("#btn-print").hide();
     reset_form_input();
     $("#status_name").html('');
     var sisa_stock = 0;
@@ -52,7 +53,7 @@ function back_to_page_ini(){
     var statusId = '1';
     if( typeof(id_header) != 'undefined' && id_header !== null && id_header !== '' ) {
         $("#btn-confirm").show();
-        $("#btn-cancel").show();                        
+        $("#btn-cancel").show();                                
         get_header();                        
     } 
 }
@@ -101,16 +102,9 @@ function get_header(){
 
 function get_detail(id_header){
     t = $('#mainTable').DataTable({
-            paging:true,
-            ordering:false,
-            info: false,
-            responsive: true,
-            scrollY: true,
-            scrollX: true,
-            scrollCollapse: true,
-            lengthChange: false,
-            dom: '<"top"i>rt<"bottom"flp><"clear">',
-            lengthMenu: [[3, 5, -1], [3, 5, 'All']],
+            responsive:true,
+            dom: 'lfrtip',
+            lengthMenu: [[5, 10, -1], [5, 10, 'All']],
             ajax: {
                 url: baseUrl + 'transaction/transaction/getdetail',
                 type: 'POST',
@@ -144,8 +138,6 @@ function get_detail(id_header){
                 var table = $('#mainTable').DataTable();
                 var table_length = table.data().count();
                 if(Number(table_length) <= 0){   
-                    $('#mainTable_filter').hide();
-                    $('#mainTable_paginate').hide();
                     $("#btn-confirm").hide();
                     $("#btn-cancel").show();
                     reset_form_input();
@@ -155,14 +147,10 @@ function get_detail(id_header){
                         total_transaksi += Number(d.subtotal);
                     });                
                     $("#total_transaksi").html(formatRupiah(total_transaksi.toFixed(0)));
-                }
-                if(Number(table_length) <= 3){   
-                    $('#mainTable_filter').hide();
-                    $('#mainTable_paginate').hide();                    
+                    $("#btn-print").show();                    
                 }
             }
         });
-        $('#mainTable').selectDTBks(t, '');
 }
 
 function delete_line_detail(xid){
@@ -242,7 +230,7 @@ function add_item(){
                 reset_form_input();
                 if(id_header == null || id_header == ''){
                     id_header = obj.id_header;            
-                    url = call_page_task(id_header);
+                    url = baseUrl + "transaction/transaction/index/"+id_header;
                     if(url !== ''){
                         $.ajax({
                             url: url,
@@ -258,12 +246,11 @@ function add_item(){
                 } else {
                     get_header();
                 }
-                window.scrollTo({ top: 0, behavior: 'smooth' });
                 alertify.success("Insert data success");                        
             } else {
                 bksfn.errMsg(obj.msg);
             }
-        }, "json").fail(function (xhr) {        
+        }, "json").fail(function (xhr) {
             alertify.error("error");
         });
     } else {
@@ -325,7 +312,7 @@ $("#btn-confirm").on('click', function (e) {
                     success: function(data) {
                         if(data.length > 0){
                             try {
-                                back_to_page_ini();
+                                back_to_this_page();
                                 alertify.success('confirm transaction success!');
                             } catch (e) {
                                 alertify.error("Error parsing JSON"+e);
@@ -357,7 +344,7 @@ $("#btn-cancel").on('click', function (e) {
                 data: {'id' : id_header},
                 datatype: 'json',
                 success: function() {
-                    back_to_page_ini();
+                    back_to_this_page();
                     alertify.success('CANCEL Transaction Success!');
                 },
                 error: function(xhr){
@@ -369,7 +356,6 @@ $("#btn-cancel").on('click', function (e) {
         }   
     }); 
 });
-
 
 function subtotal_input() {
     var xtotal  = Math.round(($('#qty').val() * $('#price').val()));

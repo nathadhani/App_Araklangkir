@@ -14,149 +14,10 @@ var bksfn = ({
         err = (err == undefined) ? "Error Connection" : "message : " + err;
         alertify.error(err);
         $(':submit').removeAttr('disabled');
-    },    
-    toProperCase: function (str) {
-        if (!str) {
-            return "";
-        }
-        return str.toLowerCase().replace(/(^|\s)\w/g, function(match) {
-            return match.toUpperCase();
-        });
-    },
-    toBulan: function (bulan) {
-        var month;
-        switch (bulan) {
-            case 1:
-                month = "Jan";
-                break;
-            case 2:
-                month = "Feb";
-                break;
-            case 3:
-                month = "Mar";
-                break;
-            case 4:
-                month = "Apr";
-                break;
-            case 5:
-                month = "Mei";
-                break;
-            case 6:
-                month = "Jun";
-                break;
-            case 7:
-                month = "Jul";
-                break;
-            case 8:
-                month = "Agt";
-                break;
-            case 9:
-                month = "Sep";
-                break;
-            case 10:
-                month = "Okt";
-                break;
-            case 11:
-                month = "Nop";
-                break;
-            case 12:
-                month = "Des";
-                break;
-        }
-        return month;
-    },
-    toTglIndo: function(tanggal) {
-        if (tanggal != null) {
-            var dateArray = tanggal.split("-");
-            var bln = this.toBulan(parseInt(dateArray[1]));
-            return dateArray[2] + " " + bln + " " + dateArray[0];
-        } else {
-            return null;
-        }
-    },
-    formatRupiahInput: function(number) {
-        var number_string = number.replace(/[^,\d]/g, '').toString(),
-        split   		= number_string.split(','),
-        sisa     		= split[0].length % 3,
-        rupiah     		= split[0].substr(0, sisa),
-        ribuan     		= split[0].substr(sisa).match(/\d{3}/gi);
-        if(ribuan) {
-            separator = sisa ? '.' : '';
-            rupiah += separator + ribuan.join('.');
-        }
-        return rupiah;
-    },    
-    getAge: function (tanggal_lahir) {
-        var date = tanggal_lahir; 
-        var today = new Date();
-        var birthday = new Date(date);
-        var year = 0;
-        if (today.getMonth() < birthday.getMonth()) {
-            year = 1;
-        } else if ((today.getMonth() == birthday.getMonth()) && today.getDate() < birthday.getDate()) {
-            year = 1;
-        }
-        var age = today.getFullYear() - birthday.getFullYear() - year;
-    
-        if(age < 0){
-            age = 0;
-        }
-        return age;
-    },
-    terBilang:function pembilang(nilai) {
-        nilai = Math.floor(Math.abs(nilai));
-       
-        var simpanNilaiBagi = 0;
-        var huruf = [
-          '',
-          'Satu',
-          'Dua',
-          'Tiga',
-          'Empat',
-          'Lima',
-          'Enam',
-          'Tujuh',
-          'Delapan',
-          'Sembilan',
-          'Sepuluh',
-          'Sebelas',
-        ];
-        var temp = '';
-       
-        if (nilai < 12) {
-          temp = ' ' + huruf[nilai];
-        } else if (nilai < 20) {
-          temp = pembilang(Math.floor(nilai - 10)) + ' Belas';
-        } else if (nilai < 100) {
-          simpanNilaiBagi = Math.floor(nilai / 10);
-          temp = pembilang(simpanNilaiBagi) + ' Puluh' + pembilang(nilai % 10);
-        } else if (nilai < 200) {
-          temp = ' Seratus' + pembilang(nilai - 100);
-        } else if (nilai < 1000) {
-          simpanNilaiBagi = Math.floor(nilai / 100);
-          temp = pembilang(simpanNilaiBagi) + ' Ratus' + pembilang(nilai % 100);
-        } else if (nilai < 2000) {
-          temp = ' Seribu' + pembilang(nilai - 1000);
-        } else if (nilai < 1000000) {
-          simpanNilaiBagi = Math.floor(nilai / 1000);
-          temp = pembilang(simpanNilaiBagi) + ' Ribu' + pembilang(nilai % 1000);
-        } else if (nilai < 1000000000) {
-          simpanNilaiBagi = Math.floor(nilai / 1000000);
-          temp = pembilang(simpanNilaiBagi) + ' Juta' + pembilang(nilai % 1000000);
-        } else if (nilai < 1000000000000) {
-          simpanNilaiBagi = Math.floor(nilai / 1000000000);
-          temp =
-            pembilang(simpanNilaiBagi) + ' Miliar' + pembilang(nilai % 1000000000);
-        } else if (nilai < 1000000000000000) {
-          simpanNilaiBagi = Math.floor(nilai / 1000000000000);
-          temp = pembilang(nilai / 1000000000000) + ' Triliun' + pembilang(nilai % 1000000000000);
-        }       
-        return temp;
-      }
+    }        
 });
     
 (function ($) {
-    //--- Fungsi Select2
     $.fn.sel2dma = function (formatResult, formatSelection, addParm) {
         var theSelect2 = this;
         var select2Config = {};
@@ -221,10 +82,8 @@ var bksfn = ({
         $(theSelectDOMopt[key]).sel2dma();
     });
 
-    //--- Fungsi Datatables select row , toggle dan delete
     $.fn.selectDTBks = function (t, uRLDelete) {
         var selDT = this;
-        //--- Select Row
         selDT.on('click', 'tr td', function () {
             if ($(this).parent().find("td").length < 3) {
                 $(this).parent().toggleClass('selected');
@@ -299,13 +158,11 @@ var bksfn = ({
         });
     };    
 
-    //---- iCheck
     $('input[type="checkbox"].icheck, input[type="radio"].icheck').iCheck({
         checkboxClass: 'icheckbox_flat-green',
         radioClass: 'iradio_flat-green'
     });
 
-    //---- Collapse
     $('[data-widget="collapse"]').on('click', function (e) {
         e.preventDefault();
         el = $(this).parent().parent().next();
@@ -359,28 +216,6 @@ var bksfn = ({
 
 })(jQuery);
 
-const bulanIndo = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September' , 'Oktober', 'November', 'Desember'];
-const bulanIndo_sort = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Juni', 'Juli', 'Agust', 'Sept' , 'Okt', 'Nov', 'Des'];
-
-function isDecimal(value) {
-    return value % 1 !== 0;
-}
-
-function formatDMY(inputFormat) {
-    function pad(s) { return (s < 10) ? '0' + s : s; }
-    var d = new Date(inputFormat);
-    return [pad(d.getDate()), pad(d.getMonth()+1), d.getFullYear()].join('-');
-}
-
-function formatDecimal(angka, decimal) {
-    if(Number(angka) > 0 && Number(decimal) > 0){
-        return Number(angka).toFixed(Number(decimal));
-    } else {
-        return 0;
-    }
-    
-}
-
 function formatRupiah(angka) {
     return Number(angka).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); 
 }  
@@ -394,8 +229,4 @@ function validasiAngka(evt){
     if(evt.length > 0) {
         evt.value = evt.value.replace(/[^0-9]/g,"");
     }
-}
-
-function call_page_task(pid_tr_header){
-    return baseUrl + "transaction/transaction/index/"+pid_tr_header;
 }

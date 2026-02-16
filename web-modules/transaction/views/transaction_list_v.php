@@ -1,14 +1,3 @@
-<style>
-    #mainTable_filter input {
-        width: 250px;
-        height: 32px;
-        background: #fcfcfc;
-        border: 1px solid #aaa;
-        border-radius: 5px;
-        box-shadow: 0 0 3px #ccc, 0 10px 15px #ffffff inset;
-        text-indent: 10px;
-    }    
-</style>
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-default">
@@ -29,8 +18,8 @@
                                     <div class="col-lg-6">
                                         <input type="text" id="tr_date" name="tr_date" placeholder="Tanggal..." class="form-control dp" data-date-format="DD MMMM YYYY" style="width:120px;" value="<?=date('d-m-Y');?>">                                        
                                     </div>
-                                    <div class="col-lg-2" style="margin-left:-15px;">
-                                        <button id="btn-submit" class="btn btn-success" style="width:120px;margin-left:10px;">Submit</button>
+                                    <div class="col-lg-4" style="margin-left:5px;">
+                                        <button id="btn-submit" class="btn btn-default" style="width:50px;margin-left:10px;"><i class="fa fa-play"></i></button>
                                     </div>    
                                 </div>        
                             </div>
@@ -47,6 +36,7 @@
                                 <th style="vertical-align:middle;text-align:center;">Number</th>
                                 <th style="vertical-align:middle;text-align:center;">Rupiah</th>
                                 <th style="vertical-align:middle;text-align:center;">Status</th>
+                                <th style="vertical-align:middle;text-align:center;">Description</th>
                                 <th style="vertical-align:middle;text-align:center;">Created</th>
                                 <th style="vertical-align:middle;text-align:center;">Created by</th>
                                 <th style="vertical-align:middle;text-align:center;">Action</th>

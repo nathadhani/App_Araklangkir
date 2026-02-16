@@ -67,10 +67,8 @@ class Transaction_list extends App_Controller {
     function getdata() {
         checkIfNotAjax();
         $postData = $this->input->post();
-        // $header_id = json_decode($postData['header_id']);
         $tr_date = revDate($postData['tr_date']);
         echo json_encode($this->dbquery($tr_date)->result(), true);
-        // echo $this->db->last_query();exit;
     }    
 
 }

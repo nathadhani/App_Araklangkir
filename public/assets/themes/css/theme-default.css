@@ -2236,8 +2236,8 @@ input[type=checkbox] {
   border-color: #D5D5D5;
 }
 .input-group-addon {
-  border-color: #E8E8E8;
-  background-color: #E8E8E8;
+  border-color: #ccc;
+  background-color: #FFF;
   font-size: 13px;
   padding: 0px 5px;
   line-height: 29px;

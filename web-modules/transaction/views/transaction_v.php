@@ -1,19 +1,6 @@
 <script type="text/javascript">  
    var id_header = <?php echo $this->uri->segment(4);?>;
 </script>
-
-<style>
-    #mainTable_filter input {
-        width: 250px;
-        height: 32px;
-        background: #fcfcfc;
-        border: 1px solid #aaa;
-        border-radius: 5px;
-        box-shadow: 0 0 3px #ccc, 0 10px 15px #ffffff inset;
-        text-indent: 10px;
-    }
-</style>
-
 <div class="row">
     <div class="col-md-12">
         <form id="mainForm" class="form-horizontal" autocomplete="off">
@@ -66,12 +53,12 @@
                             <div class="form-group row">
                                 <label class="control-label col-lg-4">Total Rp.</label>
                                 <div class="col-lg-8">
-                                    <span id="total_transaksi" style='text-align:left; color:#FF0000; font-weight:bolder; font-size:24px;'></span>
+                                    <span id="total_transaksi"></span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>                
+                </div>
             </div>
             <div class="panel panel-default">
                 <div class="panel-heading ui-draggable-handle">
@@ -109,24 +96,20 @@
                         <div class="col-md-4">
                             <div class="form-group row">
                                 <label for="price" class="control-label col-lg-4">Price</label>
-                                <div class="col-lg-8">
-                                    <input type="text" onkeypress="validasiAngka(event)" autofocuse="" id="price" name="price" class="form-control"'>
-                                </div>
+                                <div class="col-lg-8">                                    
+                                    <input type="text" onkeypress="validasiAngka(event)" autofocuse="" id="price" name="price" class="form-control">
+                                </div>                                
                             </div>
                             <div class="form-group row">
-                                <label for="subtotal" class="control-label col-lg-4">Subtotal</label>
+                                <label for="" class="control-label col-lg-4">Subtotal</label>                       
                                 <div class="col-lg-8">
-                                    <input type="text" autofocuse="" id="subtotal" class="form-control" value="0" readonly>
-                                </div>
-                            </div>
+                                    <input type="text" autofocuse="" id="subtotal" class="form-control" value="0" readonly>                                    
+                                </div>                                
+                            </div>                            
                         </div>
                         <div class="col-md-4">
-                            <div class="row">
-                                <button id="btn-add-detail" class="btn btn-success" style="width:100px;"><i class="fa fa-plus"></i>&nbsp;Item</button>
-                            </div>
-                            <div class="row" style="margin-top:10px;">    
-                                <button id="btn-reset-detail" class="btn btn-danger" style="width:100px;"><i class="fa fa-undo"></i>&nbsp;Clear</button>
-                            </div>            
+                            <button id="btn-add-detail" class="btn btn-default" style="width:50px;"><i class="fa fa-plus"></i></button>
+                            <button id="btn-reset-detail" class="btn btn-default" style="width:50px;"><i class="fa fa-undo"></i></button>                        
                         </div>
                     </div>                    
                 </div>
@@ -151,8 +134,9 @@
                     </div>
                 </div>
                 <div class="panel-footer">
-                    <button id="btn-confirm" class="btn btn-success" style="width:100px;">Confirm</button>
-                    <button id="btn-cancel" class="btn btn-danger" style="width:100px;">Cancel</button>
+                    <button id="btn-confirm" class="btn btn-default" style="width:50px;"><i class="fa fa-save"></i></button>
+                    <button id="btn-cancel" class="btn btn-default" style="width:50px;"><i class="fa fa-undo"></i></button>
+                    <button id="btn-print" class="btn btn-default" style="width:50px;"><i class="fa fa-print"></i></button>                    
                 </div>                
             </div>
         </form>

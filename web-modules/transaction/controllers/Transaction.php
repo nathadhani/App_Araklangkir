@@ -34,8 +34,6 @@ class Transaction extends App_Controller {
     
     function insert(){
         checkIfNotAjax();        
-        /** Insert Header */
-        /** -------------------------------------------------------------------------------- */
         $postData = $this->input->post();      
         if( isset($postData['header_id']) ){
             if(($postData['header_id'] == 'null' || $postData['header_id'] == '')) {            
@@ -43,19 +41,17 @@ class Transaction extends App_Controller {
                 unset($postData['product_id']);
                 unset($postData['qty']);
                 unset($postData['price']);
+                unset($postData['mainTable_length']);
                 if(isset($postData['tr_date'])){
                     $postData['tr_date'] = revDate($postData['tr_date']);
-                    /**----------------------------------------------------- */
                     $datetime = date('Y-m-d H:i:s');
                     $new_date = $postData['tr_date'];
                     $new_datetime = date('Y-m-d H:i:s', strtotime($new_date . ' ' . date('H:i:s', strtotime($datetime))));
                     $postData['created'] = $new_datetime;
                 } else {
                     $postData['tr_date'] = Date('Y-m-d');
-                }
-                        
-                $postData['status'] = '1';
-                
+                }                        
+                $postData['status'] = '1';                
                 $this->db->trans_begin();
                 $this->Appmdl->table = 'tr_header';
                 $response = $this->Appmdl->insert($postData);
@@ -74,9 +70,9 @@ class Transaction extends App_Controller {
                 unset($postData['product_id']);
                 unset($postData['qty']);
                 unset($postData['price']);
+                unset($postData['mainTable_length']);
                 if(isset($postData['tr_date'])){
                     $postData['tr_date'] = revDate($postData['tr_date']);
-                    /**----------------------------------------------------- */
                     $datetime = date('Y-m-d H:i:s');
                     $new_date = $postData['tr_date'];
                     $new_datetime = date('Y-m-d H:i:s', strtotime($new_date . ' ' . date('H:i:s', strtotime($datetime))));
@@ -95,29 +91,21 @@ class Transaction extends App_Controller {
                     echo json_encode($json);
                 } else {
                     $this->db->trans_commit();
-                    $json['msg'] = '1';
-                    echo json_encode($json);
                 }
             }
-        }        
-        /** End of Inser Header -------------------------------------------------------------------------------- */
-
-        /** Insert Detail */
-        /** -------------------------------------------------------------------------------- */
+        }
         $postDetail = $this->input->post();
         if( isset($id_header) && $id_header > 0 && ( $id_header != 'null' || $id_header !== '') ){
             $this->db->trans_begin();
-
             unset($postDetail['tr_id']);
             unset($postDetail['tr_date']);
             unset($postDetail['description']);
-
+            unset($postDetail['mainTable_length']);
             $postDetail['header_id'] = $id_header;
             if (strpos($postDetail['price'], ',') !== false) {
                 $postDetail['price'] = str_replace(',','.',$postDetail['price']);
             }        
-            $postDetail['status'] = '1';          
-
+            $postDetail['status'] = '1';
             $this->Appmdl->table = 'tr_detail';
             $product_id = $postDetail['product_id'];
             $qty = $postDetail['qty'];
@@ -129,7 +117,7 @@ class Transaction extends App_Controller {
                                           AND qty = $qty
                                           AND price = $price";
             $cek_detail = $this->db->query($qstr)->result();
-            if( empty($cek_detail)){
+            if(empty($cek_detail)){
                 $response = $this->Appmdl->insert($postDetail);
             } else {
                 if($cek_detail[0]->id != null){
@@ -137,7 +125,7 @@ class Transaction extends App_Controller {
                     $postDetailupdate['qty'] = $postDetail['qty'];
                     $response = $this->Appmdl->update($postDetailupdate, 'id=' . $id);
                 }
-            }            
+            } 
             if ($this->db->trans_status() === FALSE) {
                 $this->db->trans_rollback();
                 $err = $this->db->error();
@@ -150,7 +138,6 @@ class Transaction extends App_Controller {
                 echo json_encode($json);
             }
         }
-        /** End of Inser Detail -------------------------------------------------------------------------------- */
     }
     
     function delete_detail(){
@@ -227,7 +214,6 @@ class Transaction extends App_Controller {
         $postData = $this->input->post();
         $id = json_decode($postData['id']);
         $query = $this->dbquery_tr_header($id)->result();
-        // echo $this->db->last_query();exit;
         echo json_encode($query, true);        
     }
     
@@ -247,7 +233,6 @@ class Transaction extends App_Controller {
                                    WHERE tr_detail.header_id= " . $header_id ." 
                                    ORDER BY tr_detail.product_id, tr_detail.price ASC")->result();
 
-        // echo $this->db->last_query();exit;
         echo json_encode($query, true);                
     }
 
@@ -321,7 +306,6 @@ class Transaction extends App_Controller {
                                    AND stock.stock_month = $bulan
                                    AND stock.product_id = $product_id
                                    LIMIT 1")->result();
-        // echo $this->db->last_query();exit;
         echo json_encode($query, true);
     }    
         
@@ -342,13 +326,10 @@ class Transaction extends App_Controller {
             if(count($get_header > 0)){
                 $tr_date = $get_header[0]->tr_date;
                 $tr_number = ($get_header[0]->tr_number !== '' &&  $get_header[0]->tr_number !== null ? $get_header[0]->tr_number : $this->generate_nomor($tr_id, $tr_date));
-
                 $this->db->where(array('id' => $header_id));
                 $this->db->update('tr_header', array('tr_id' => $tr_id,'tr_number' => $tr_number, 'status' => 3, 'description' => $description, 'updated' => date('Y-m-d H:i:s', time()), 'updatedby' => $this->userId) );
-
                 $this->db->where(array('header_id' => $header_id));
                 $this->db->update('tr_detail', array('status' => 3, 'updated' => date('Y-m-d H:i:s', time()), 'updatedby' => $this->userId) );
-
                 $select = $this->db->select('product_id')->where('header_id', $header_id)->get('tr_detail');
                 if($select->num_rows()){                           
                     $tahun = (int) SUBSTR($get_header[0]->tr_date,0,4);
@@ -380,7 +361,6 @@ class Transaction extends App_Controller {
         } else {
             $this->db->where(array('header_id' => $header_id));
             $this->db->update('tr_detail', array('status' => 2, 'updated' => date('Y-m-d H:i:s', time()), 'updatedby' => $this->userId) );
-
             $this->db->trans_commit();
             $json['msg'] = '1';
             echo json_encode($json);
