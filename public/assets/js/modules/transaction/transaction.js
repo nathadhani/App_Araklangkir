@@ -1,46 +1,4 @@
 back_to_this_page();
-
-$('#product_id').on('change',function(){
-    if($(this).val() != null && $(this).val() != ''){
-        getstockbyid();
-        subtotal_input(); 
-    } else {
-        $('#qty').val('');
-        $('#price').val('');
-        $('#subtotal').val('');
-    }
-});
-
-$("#qty").keyup(function(e) {
-    e.preventDefault();
-    $(this).val($(this).val());    
-    if($(this).val() != null && $(this).val() != ''){
-        $(this).val($(this).val());
-        subtotal_input();
-    } else {
-        $('#price').val('');
-        $('#subtotal').val('');
-    }
-});
-
-$("#price").keyup(function(e) {
-    e.preventDefault();
-    if($(this).val() != null && $(this).val() != ''){
-        $(this).val($(this).val());
-        subtotal_input();
-    } else {
-        $('#subtotal').val('');
-    }
-});
-
-function reset_form_input(){
-    $("#product_id").html('').sel2dma();    
-    $("#qty").val('');
-    $("#price").val('');
-    $("#subtotal").val('');
-    $("#btn-add-detail").focus();
-}
-
 function back_to_this_page(){ 
     $("#ftitle").html('New');
     $("#btn-confirm").hide();
@@ -102,77 +60,155 @@ function get_header(){
 
 function get_detail(id_header){
     t = $('#mainTable').DataTable({
-            responsive:true,
-            dom: 'lfrtip',
-            lengthMenu: [[5, 10, -1], [5, 10, 'All']],
-            ajax: {
-                url: baseUrl + 'transaction/transaction/getdetail',
-                type: 'POST',
-                data: {'header_id' : id_header},
-                dataSrc: ""
-            },
-            columns: [
-                {data: '#', width: "4%", className: "dt-body-center", render: function (data, type, row, meta) {                    
-                    return meta.row + meta.settings._iDisplayStart + 1;
-                }},
-                {data: 'product_code', width: "50%", render: function (data, type, row, meta) {                    
-                    return data + ' - ' + row.product_name;
-                }},
-                {data: 'qty',  width: "11%", render: function (data, type, row, meta) {
-                    return formatRupiah(data)
-                }},
-                {data: 'price',  width: "10%", render: function (data, type, row, meta) {
-                    return formatRupiah(data)
-                }},
+        responsive:true,
+        dom: 'lfrtip',
+        lengthMenu: [[5, 10, -1], [5, 10, 'All']],
+        ajax: {
+            url: baseUrl + 'transaction/transaction/getdetail',
+            type: 'POST',
+            data: {'header_id' : id_header},
+            dataSrc: ""
+        },
+        columns: [
+            {data: '#', width: "4%", className: "dt-body-center", render: function (data, type, row, meta) {                    
+                return meta.row + meta.settings._iDisplayStart + 1;
+            }},
+            {data: 'product_code', width: "50%", render: function (data, type, row, meta) {                    
+                return data + ' - ' + row.product_name;
+            }},
+            {data: 'qty',  width: "11%", render: function (data, type, row, meta) {
+                return formatRupiah(data)
+            }},
+            {data: 'price',  width: "10%", render: function (data, type, row, meta) {
+                return formatRupiah(data)
+            }},
 
-                {data: 'subtotal',  width: "15%", render: function (data, type, row, meta) {
-                    return formatRupiah(data)
-                }},
-                {data: 'id', width: "10%", orderable: false, render: function (data, type, row, meta) {
-                        return '<a style="cursor:pointer;font-weight:400;color:red;" title="hapus" onClick="delete_line_detail(' + data + ')"><i>remove</i></a>';
-                    }
-                },
-            ],           
-            order: [[1, 'asc']],
-            initComplete: function() {
-                var table = $('#mainTable').DataTable();
-                var table_length = table.data().count();
-                if(Number(table_length) <= 0){   
-                    $("#btn-confirm").hide();
-                    $("#btn-cancel").show();
-                    reset_form_input();
-                } else {
-                    var total_transaksi = 0;
-                    $.each(table.data(), function (i, d) {               
-                        total_transaksi += Number(d.subtotal);
-                    });                
-                    $("#total_transaksi").html(formatRupiah(total_transaksi.toFixed(0)));
-                    $("#btn-print").show();                    
+            {data: 'subtotal',  width: "15%", render: function (data, type, row, meta) {
+                return formatRupiah(data)
+            }},
+            {data: 'id', width: "10%", orderable: false, render: function (data, type, row, meta) {
+                    return '<a style="cursor:pointer;font-weight:400;color:red;" title="hapus" onClick="delete_line_detail(' + data + ')"><i>remove</i></a>';
                 }
+            },
+        ],           
+        order: [[1, 'asc']],
+        initComplete: function() {
+            var table = $('#mainTable').DataTable();
+            var table_length = table.data().count();
+            if(Number(table_length) <= 0){   
+                $("#btn-confirm").hide();
+                $("#btn-cancel").show();
+                reset_form_input();
+            } else {
+                var total_transaksi = 0;
+                $.each(table.data(), function (i, d) {               
+                    total_transaksi += Number(d.subtotal);
+                });                
+                $("#total_transaksi").html(formatRupiah(total_transaksi.toFixed(0)));
+                $("#btn-print").show();                    
             }
-        });
+        }
+    });
 }
 
 function delete_line_detail(xid){
     if( typeof(xid) != 'undefined' && xid !== null && xid !== '' ) {
-        alertify.confirm("are you sure, DELETE item ?", function (x) {
-            if (x) {    
-                $.ajax({
-                    url : baseUrl +  'transaction/transaction/delete_detail',
-                    type: 'POST',
-                    data: {'id' : xid },
-                    datatype: 'json',
-                    success: function(data){
-                        get_header();
-                        alertify.success("Delete item success");
-                    },
-                    error: function(xhr){                
-                        alertify.error("error");
-                    }
-                });
+        $.ajax({
+            url : baseUrl +  'transaction/transaction/delete_detail',
+            type: 'POST',
+            data: {'id' : xid },
+            datatype: 'json',
+            success: function(data){
+                get_header();
+                alertify.success("Delete item success");
+            },
+            error: function(xhr){                
+                alertify.error("error");
             }
         });
     }       
+}
+
+function reset_form_input(){
+    $("#product_id").html('').sel2dma();    
+    $("#qty").val('');
+    $("#price").val('');
+    $("#subtotal").val('');
+    $("#btn-add-detail").focus();
+}
+
+function add_item(){
+    subtotal_input();
+    if( formatRupiahtoNumber($("#subtotal").val()) > 0){
+        $.post(baseUrl +'transaction/transaction/insert', $("#mainForm").serialize() + "&header_id=" + id_header + "&tr_id=" + xtr_id + "&tr_date=" + $("#tr_date").val() , function (obj) {
+            if (obj.msg == 1) {            
+                reset_form_input();
+                if(id_header == null || id_header == ''){
+                    id_header = obj.id_header;            
+                    url = baseUrl + "transaction/transaction/index/"+id_header;
+                    if(url !== ''){
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            success: function() {
+                                window.open(url,'_self'); 
+                            },
+                            error: function(){
+                                alertify.error("can't open page.!");
+                            }
+                        });    
+                    }
+                } else {
+                    get_header();
+                }
+                alertify.success("Insert data success");                        
+            } else {
+                bksfn.errMsg(obj.msg);
+            }
+        }, "json").fail(function (xhr) {
+            alertify.error("error");
+        });
+    } else {
+        alertify.alert('Nilai Subtotal kosong!');
+        return false;
+    }
+}
+
+function getstockbyid(){
+    xtr_id = $("#tr_id").val();
+    if(xtr_id == 2){
+        if($("#product_id").val() !== null && $("#product_id").val() !== ''){
+            $.ajax({
+                url: baseUrl + 'transaction/transaction/getstockbyid',
+                type: 'POST',
+                data: {'product_id' : $("#product_id").val(), 'period' : $("#tr_date").val() },
+                datatype: 'json',
+                success: function(data){
+                    console.log(data);
+                    if (data !== undefined) {
+                        if (data !== '[]' && data.length > 0){
+                            var d = JSON.parse(data)[0];
+                            sisa_stock = (d.ending_stock === null ? 0 : Number(d.ending_stock));
+                            if(sisa_stock > 0){
+                                $("#qty").val(sisa_stock);
+                                subtotal_input();
+                            }
+                        } else {
+                            sisa_stock = 0;                         
+                        }
+                    }
+                },
+                error: function(xhr){
+                    alertify.error("error");
+                }
+            });
+        }
+    }
+}
+
+function subtotal_input() {
+    var xtotal  = Math.round(($('#qty').val() * $('#price').val()));
+    $('#subtotal').val(formatRupiah(xtotal.toString()));        
 }
 
 $("#btn-add-detail").on('click', function (e) {
@@ -222,75 +258,6 @@ $("#btn-reset-detail").on('click', function (e) {
     reset_form_input();        
 });
 
-function add_item(){
-    subtotal_input();
-    if( formatRupiahtoNumber($("#subtotal").val()) > 0){
-        $.post(baseUrl +'transaction/transaction/insert', $("#mainForm").serialize() + "&header_id=" + id_header + "&tr_id=" + xtr_id + "&tr_date=" + $("#tr_date").val() , function (obj) {
-            if (obj.msg == 1) {            
-                reset_form_input();
-                if(id_header == null || id_header == ''){
-                    id_header = obj.id_header;            
-                    url = baseUrl + "transaction/transaction/index/"+id_header;
-                    if(url !== ''){
-                        $.ajax({
-                            url: url,
-                            type: 'POST',
-                            success: function() {
-                                window.open(url,'_self'); 
-                            },
-                            error: function(){
-                                alertify.error("can't open page.!");
-                            }
-                        });    
-                    }
-                } else {
-                    get_header();
-                }
-                alertify.success("Insert data success");                        
-            } else {
-                bksfn.errMsg(obj.msg);
-            }
-        }, "json").fail(function (xhr) {
-            alertify.error("error");
-        });
-    } else {
-        alertify.alert('Nilai Subtotal kosong!');
-        return false;
-    }
-}
-
-function getstockbyid(){
-    xtr_id = $("#tr_id").val();
-    if(xtr_id == 2){ // Trx OUT
-        if($("#product_id").val() !== null && $("#product_id").val() !== ''){
-            $.ajax({
-                url: baseUrl + 'transaction/transaction/getstockbyid',
-                type: 'POST',
-                data: {'product_id' : $("#product_id").val(), 'period' : $("#tr_date").val() },
-                datatype: 'json',
-                success: function(data){
-                    console.log(data);
-                    if (data !== undefined) {
-                        if (data !== '[]' && data.length > 0){
-                            var d = JSON.parse(data)[0];
-                            sisa_stock = (d.ending_stock === null ? 0 : Number(d.ending_stock));
-                            if(sisa_stock > 0){
-                                $("#qty").val(sisa_stock);
-                                subtotal_input();
-                            }
-                        } else {
-                            sisa_stock = 0;                         
-                        }
-                    }
-                },
-                error: function(xhr){
-                    alertify.error("error");
-                }
-            });
-        }
-    }
-}
-
 $("#btn-confirm").on('click', function (e) {
     e.preventDefault();
     var table = $('#mainTable').DataTable();
@@ -298,37 +265,30 @@ $("#btn-confirm").on('click', function (e) {
     if(Number(table_length) <= 0){
         bksfn.errMsg("belum ada data diinput!");
     } else {
-        alertify.confirm("are you sure, CONFIRM transaction ?", function (x) {
-            if (x) {
-                $.ajax({
-                    url: baseUrl + 'transaction/transaction/confirm_task',
-                    type: 'POST',
-                    beforeSend: function(){
-                        $(".ajax-loader").height($(document).height());
-                        $('.ajax-loader').css("visibility", "visible");
-                    },
-                    data: {'id' : id_header, 'tr_id' : $("#tr_id").val(), 'description' : $("#description").val()},
-                    datatype: 'json',
-                    success: function(data) {
-                        if(data.length > 0){
-                            try {
-                                back_to_this_page();
-                                alertify.success('confirm transaction success!');
-                            } catch (e) {
-                                alertify.error("Error parsing JSON"+e);
-                                console.error('Error parsing JSON:', e);
-                            }                        
-                        }                        
-                    },
-                    complete: function(){
-                        $('.ajax-loader').css("visibility", "hidden");
-                    },
-                    error: function(xhr){
+        $.ajax({
+            url: baseUrl + 'transaction/transaction/confirm_task',
+            type: 'POST',
+            beforeSend: function(){
+                $(".ajax-loader").height($(document).height());
+                $('.ajax-loader').css("visibility", "visible");
+            },
+            data: {'id' : id_header, 'tr_id' : $("#tr_id").val(), 'description' : $("#description").val()},
+            datatype: 'json',
+            success: function(data) {
+                if(data.length > 0){
+                    try {
+                        back_to_this_page();
+                        alertify.success('confirm transaction success!');
+                    } catch (e) {
                         alertify.error("error");
-                    }
-                });
-            } else {
-                $('#tr_id').prop('disabled', false);
+                    }                        
+                }                        
+            },
+            complete: function(){
+                $('.ajax-loader').css("visibility", "hidden");
+            },
+            error: function(xhr){
+                alertify.error("error");
             }
         });        
     }        
@@ -336,28 +296,50 @@ $("#btn-confirm").on('click', function (e) {
 
 $("#btn-cancel").on('click', function (e) {
     e.preventDefault();
-    alertify.confirm("are you sure, CANCEL transaction ?", function (x) {
-        if (x) {
-            $.ajax({
-                url: baseUrl + 'transaction/transaction/cancel_trx',
-                type: 'POST',
-                data: {'id' : id_header},
-                datatype: 'json',
-                success: function() {
-                    back_to_this_page();
-                    alertify.success('CANCEL Transaction Success!');
-                },
-                error: function(xhr){
-                    alertify.error("error");
-                }
-            });                                                                    
-        } else {
-            back_to_page_show(id_header);
-        }   
-    }); 
+    $.ajax({
+        url: baseUrl + 'transaction/transaction/cancel_trx',
+        type: 'POST',
+        data: {'id' : id_header},
+        datatype: 'json',
+        success: function() {
+            back_to_this_page();
+            alertify.success('CANCEL Transaction Success!');
+        },
+        error: function(xhr){
+            alertify.error("error");
+        }
+    });
 });
 
-function subtotal_input() {
-    var xtotal  = Math.round(($('#qty').val() * $('#price').val()));
-    $('#subtotal').val(formatRupiah(xtotal.toString()));        
-}
+$('#product_id').on('change',function(){
+    if($(this).val() != null && $(this).val() != ''){
+        getstockbyid();
+        subtotal_input(); 
+    } else {
+        $('#qty').val('');
+        $('#price').val('');
+        $('#subtotal').val('');
+    }
+});
+
+$("#qty").keyup(function(e) {
+    e.preventDefault();
+    $(this).val($(this).val());    
+    if($(this).val() != null && $(this).val() != ''){
+        $(this).val($(this).val());
+        subtotal_input();
+    } else {
+        $('#price').val('');
+        $('#subtotal').val('');
+    }
+});
+
+$("#price").keyup(function(e) {
+    e.preventDefault();
+    if($(this).val() != null && $(this).val() != ''){
+        $(this).val($(this).val());
+        subtotal_input();
+    } else {
+        $('#subtotal').val('');
+    }
+});

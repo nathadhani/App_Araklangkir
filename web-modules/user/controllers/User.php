@@ -7,7 +7,6 @@ class User extends App_Controller {
         parent::__construct($config);
         $this->Appmdl->table = 'users';
         $this->auth = $this->session->userdata( 'auth' );
-
     }
 
     function index() {
@@ -18,12 +17,10 @@ class User extends App_Controller {
     function insert() {
         checkIfNotAjax();
         $postData = $this->input->post();
-
         $postData['username'] = trim(trim(strtolower($postData['username'])));
-        $postData['password'] = $this->encrypt->hash($postData['password']);
+        $postData['password'] = $this->encryption->encrypt($postData['password']);
         $postData['fullname'] = trim($postData['fullname']);
         $postData['status'] = cekStatus($postData);
-        
         $status = $this->Appmdl->insert($postData);
         if ($status == 'true') {
             $json['msg'] = '1';
@@ -31,8 +28,7 @@ class User extends App_Controller {
         } else {
             $json['msg'] = $status;
             echo json_encode($json);
-        }
-
+        }        
     }
 
     function update() {
@@ -46,7 +42,6 @@ class User extends App_Controller {
             unset($postData['password']);
         }
         $postData['status'] = cekStatus($postData);
-
         $id = $postData['id'];
         unset($postData['id']);
         $status = $this->Appmdl->update($postData, 'id=' . $id);
@@ -75,8 +70,8 @@ class User extends App_Controller {
 
     function getData() {
         checkIfNotAjax();
-        $cpData = $this->Appmdl->getDataTable();
-        $this->Appmdl->outputToJson($cpData);
+        $cpData = $this->db->query("SELECT * FROM users")->result();
+        echo json_encode($cpData, true);
     }
 
     function getDataUser() {
@@ -89,5 +84,4 @@ class User extends App_Controller {
         $result['more'] = true;
         echo json_encode($result);
     }
-
 }

@@ -59,8 +59,8 @@ class Product extends App_Controller {
 
     function getData() {
         checkIfNotAjax();
-        $cpData = $this->Appmdl->getDataTable();
-        $this->Appmdl->outputToJson($cpData);
+        $cpData = $this->db->query("SELECT * FROM Product")->result();
+        echo json_encode($cpData, true);
     }
 
     function getproduct() {

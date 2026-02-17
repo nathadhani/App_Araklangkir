@@ -20,7 +20,7 @@
                             <div class="form-group row">
                                 <label class="control-label col-lg-4">Product Name</label>
                                 <div class="col-lg-8">
-                                    <input type="text" id="product_name" name="product_name" placeholder="Icon..." class="form-control">
+                                    <input type="text" id="product_name" name="product_name" placeholder="Product Name..." class="form-control">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -64,12 +64,8 @@
     <div class="col-md-12">
         <div class="panel panel-default">
             <div class="panel-body">
-                <div id="mainTable" class="box-body">
-                    <div style="padding: 0 20px 10px 20px" class="row">
-                        <button class="btn btn-default toggle-selected" title="Toggle Selected" data-toggle="tooltip" data-placement="bottom"><i class="fa  fa-align-justify"></i></button> 
-                        <button class="btn btn-default delete-selected pull-right" title="Delete Rows" data-toggle="tooltip" data-placement="bottom"><i class="fa  fa-trash"></i></button> 
-                    </div>
-                    <table class="table table-bordered table-condensed table-hover table-striped dataTable">
+                <div class="row">
+                    <table class="table table-bordered table-condensed table-striped table-hover table-responsive" width="100%" id="mainTable">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -79,17 +75,6 @@
                                 <th>Price</th>
                                 <th>Status</th>
                                 <th>Action</th>
-                            </tr>
-                        </thead>
-                        <thead id="searchid">
-                            <tr>
-                                <td><button class="clrs btn btn-sm btn-info btn-line">Clear</button></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
                             </tr>
                         </thead>
                         <tbody></tbody>
