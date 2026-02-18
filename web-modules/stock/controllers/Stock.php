@@ -7,8 +7,7 @@ class Stock extends App_Controller {
     {
         $config = array('modules' => 'stock', 'jsfiles' => array('stock'));
         parent::__construct($config);        
-        $this->auth = $this->session->userdata( 'auth' );
-        $this->store_id = $this->auth['store_id'];               
+        $this->auth = $this->session->userdata( 'auth' ); 
     }
     
     function index()

@@ -12,7 +12,7 @@
         <!-- END META SECTION -->
 
         <!-- CSS INCLUDE -->        
-        <link id="theme" href="assets/themes/css/theme-default.css" rel="stylesheet" type="text/css"/>
+        <link id="theme" href="assets/themes/css/webapp.css" rel="stylesheet" type="text/css"/>
         <link href="assets/libs/alertify/css/alertify.core.css" rel="stylesheet" type="text/css"/>
         <link href="assets/libs/alertify/css/alertify.bootstrap.css" rel="stylesheet" type="text/css"/>
         <!-- EOF CSS INCLUDE -->    

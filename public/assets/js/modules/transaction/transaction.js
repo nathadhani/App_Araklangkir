@@ -87,7 +87,7 @@ function get_detail(id_header){
                 return formatRupiah(data)
             }},
             {data: 'id', width: "10%", orderable: false, render: function (data, type, row, meta) {
-                    return '<a style="cursor:pointer;font-weight:400;color:red;" title="hapus" onClick="delete_line_detail(' + data + ')"><i>remove</i></a>';
+                    return '<a style="cursor:pointer;font-weight:400;color:red;" title="hapus" onClick="deleted(' + data + ')"><i>remove</i></a>';
                 }
             },
         ],           
@@ -111,10 +111,10 @@ function get_detail(id_header){
     });
 }
 
-function delete_line_detail(xid){
+function deleted(xid){
     if( typeof(xid) != 'undefined' && xid !== null && xid !== '' ) {
         $.ajax({
-            url : baseUrl +  'transaction/transaction/delete_detail',
+            url : baseUrl +  'transaction/transaction/delete',
             type: 'POST',
             data: {'id' : xid },
             datatype: 'json',
@@ -122,7 +122,7 @@ function delete_line_detail(xid){
                 get_header();
                 alertify.success("Delete item success");
             },
-            error: function(xhr){                
+            error: function(xhr){
                 alertify.error("error");
             }
         });
@@ -130,7 +130,7 @@ function delete_line_detail(xid){
 }
 
 function reset_form_input(){
-    $("#product_id").html('').sel2dma();    
+    $("#product_id").html('').sel2dma();
     $("#qty").val('');
     $("#price").val('');
     $("#subtotal").val('');
@@ -266,7 +266,7 @@ $("#btn-confirm").on('click', function (e) {
         bksfn.errMsg("belum ada data diinput!");
     } else {
         $.ajax({
-            url: baseUrl + 'transaction/transaction/confirm_task',
+            url: baseUrl + 'transaction/transaction/confirm',
             type: 'POST',
             beforeSend: function(){
                 $(".ajax-loader").height($(document).height());
@@ -297,7 +297,7 @@ $("#btn-confirm").on('click', function (e) {
 $("#btn-cancel").on('click', function (e) {
     e.preventDefault();
     $.ajax({
-        url: baseUrl + 'transaction/transaction/cancel_trx',
+        url: baseUrl + 'transaction/transaction/cancel',
         type: 'POST',
         data: {'id' : id_header},
         datatype: 'json',
@@ -307,6 +307,27 @@ $("#btn-cancel").on('click', function (e) {
         },
         error: function(xhr){
             alertify.error("error");
+        }
+    });
+});
+
+$("#btn-print").on('click', function (e) {
+    e.preventDefault();
+    let url = "transaction/transaction/print_nota/"+id_header;
+    $.ajax({
+        url: url,
+        type: 'POST',
+        success: function(resp){
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            iframe.src = url;
+            iframe.onload = function() {
+                iframe.contentWindow.print();
+            };            
+        },
+        error: function(xhr){
+            alertify.error("error can't print");
         }
     });
 });

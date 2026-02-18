@@ -6,7 +6,7 @@
                     <div class="col-md-6">
                         <div class="form-group">                                
                             <div class="col-lg-12">
-                                <label for="store_id" style="display:block">Product</label>
+                                <label for="product_id" style="display:block">Product</label>
                                 <select id="product_id"
                                         name="product_id"
                                         data-ajax="true"

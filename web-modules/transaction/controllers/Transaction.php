@@ -15,7 +15,7 @@ class Transaction extends App_Controller {
         $this->template->build('transaction/transaction_v', $data);
     }
 
-    function generate_nomor($tr_id, $tr_date) {
+    function nota($tr_id, $tr_date) {
         $Number = 0;
         $thn = SUBSTR($tr_date,0,4);
         $bln = SUBSTR($tr_date,5,2);
@@ -140,7 +140,7 @@ class Transaction extends App_Controller {
         }
     }
     
-    function delete_detail(){
+    function delete(){
         checkIfNotAjax();
         $postData = $this->input->post();
         $id = json_decode($postData['id']);        
@@ -158,9 +158,12 @@ class Transaction extends App_Controller {
             echo json_encode($json);
         }
     }
-
-    function dbquery_tr_header($id){
-        return $this->db->query("SELECT
+    
+    function getheader(){
+        checkIfNotAjax();
+        $postData = $this->input->post();
+        $id = json_decode($postData['id']);
+        $query = $this->db->query("SELECT
                                     tr_header.id AS id,
                                     tr_header.tr_id AS tr_id,
                                     tr_header.tr_date AS tr_date,
@@ -206,14 +209,7 @@ class Transaction extends App_Controller {
                                 LEFT JOIN users usr1 ON tr_header.createdby = usr1.id						
                                 LEFT JOIN users usr2 ON tr_header.updatedby = usr2.id	
                                 WHERE tr_header.id = $id
-                                ORDER BY tr_header.tr_id ASC, tr_header.tr_number ASC LIMIT 1");
-    }
-    
-    function getheader(){
-        checkIfNotAjax();
-        $postData = $this->input->post();
-        $id = json_decode($postData['id']);
-        $query = $this->dbquery_tr_header($id)->result();
+                                ORDER BY tr_header.tr_id ASC, tr_header.tr_number ASC LIMIT 1")->result();
         echo json_encode($query, true);        
     }
     
@@ -309,7 +305,7 @@ class Transaction extends App_Controller {
         echo json_encode($query, true);
     }    
         
-    function confirm_task() {
+    function confirm() {
         checkIfNotAjax();
         $postData = $this->input->post();
         $header_id = $postData['id'];
@@ -323,9 +319,9 @@ class Transaction extends App_Controller {
             echo json_encode($json);
         } else {
             $get_header = $this->db->query("SELECT id, tr_id, tr_date, tr_number FROM tr_header WHERE id = $header_id")->result();
-            if(count($get_header > 0)){
+            if(count($get_header) > 0){
                 $tr_date = $get_header[0]->tr_date;
-                $tr_number = ($get_header[0]->tr_number !== '' &&  $get_header[0]->tr_number !== null ? $get_header[0]->tr_number : $this->generate_nomor($tr_id, $tr_date));
+                $tr_number = ($get_header[0]->tr_number !== '' &&  $get_header[0]->tr_number !== null ? $get_header[0]->tr_number : $this->nota($tr_id, $tr_date));
                 $this->db->where(array('id' => $header_id));
                 $this->db->update('tr_header', array('tr_id' => $tr_id,'tr_number' => $tr_number, 'status' => 3, 'description' => $description, 'updated' => date('Y-m-d H:i:s', time()), 'updatedby' => $this->userId) );
                 $this->db->where(array('header_id' => $header_id));
@@ -346,7 +342,7 @@ class Transaction extends App_Controller {
         }
     }
 
-    function cancel_trx(){
+    function cancel(){
         checkIfNotAjax();
         $postData = $this->input->post();
         $header_id = json_decode($postData['id']);
@@ -365,6 +361,110 @@ class Transaction extends App_Controller {
             $json['msg'] = '1';
             echo json_encode($json);
         }            
+    }
+
+    function print_nota()
+    {       
+        $header_id = $this->uri->segment(4);
+        $data_header = $this->db->query("SELECT
+                                    tr_header.id AS id,
+                                    tr_header.tr_id AS tr_id,
+                                    tr_header.tr_date AS tr_date,
+                                    tr_header.tr_number AS tr_number,
+                                    tr_header.description AS description,
+                                    tr_header.status AS status,
+                                    tr_header.created AS created,
+                                    tr_header.updated AS updated,
+                                    tr_header.createdby AS createdby,
+                                    tr_header.updatedby AS updatedby,
+                                    (
+                                        SELECT
+                                        (
+                                            CASE
+                                                
+                                                WHEN ( tr_header.tr_id = 1 ) THEN
+                                                'IN'
+                                                WHEN ( tr_header.tr_id = 2 ) THEN
+                                                'OUT'
+                                            END 
+                                        )
+                                    ) AS tr_name,
+                                    usr1.fullname AS createdby_name,
+                                    usr2.fullname AS updatedby_name,
+                                    (
+                                        SELECT
+                                        (
+                                            CASE
+                                                WHEN ( tr_header.status = 1 ) THEN
+                                                'Task' 
+                                                WHEN ( tr_header.status = 2 ) THEN
+                                                'Canceled' 
+                                                WHEN ( tr_header.status = 3 ) THEN
+                                                'Confirm' 
+                                            END 
+                                        )
+                                    ) AS status_name,
+                                    (
+                                        SELECT COALESCE(sum(tr_detail.qty * tr_detail.price),0) FROM tr_detail WHERE tr_detail.header_id = tr_header.id
+                                    ) AS total
+
+                                FROM tr_header
+                                LEFT JOIN users usr1 ON tr_header.createdby = usr1.id						
+                                LEFT JOIN users usr2 ON tr_header.updatedby = usr2.id	
+                                WHERE tr_header.id = $header_id
+                                ORDER BY tr_header.tr_id ASC, tr_header.tr_number ASC LIMIT 1")->result();        
+
+        $data_detail = $this->db->query("SELECT CONCAT(product.product_code,' - ',product.product_name) AS product_name,
+                                        SUM(tr_detail.qty) AS qty,
+                                        tr_detail.price
+                                   FROM tr_detail 
+                                   JOIN product ON tr_detail.product_id = product.id
+                                   WHERE tr_detail.header_id= " . $header_id ." 
+                                   GROUP BY tr_detail.product_id, tr_detail.price
+                                   ORDER BY tr_detail.product_id, tr_detail.price ASC")->result();
+        $pdf = new Pdf();        
+        $pdf->SetPrintHeader(false);
+        $pdf->SetPrintFooter(false);
+        $pdf->AddPage('P', 'A4'); 
+        $pdf->SetFont('helvetica', '', 12);        
+        if(!empty($data_detail)) {
+            $no = 0;
+            $total = 0;
+            foreach($data_detail as $r){
+                $no++;                
+                $pdf->Ln(1);
+                $pdf->Cell(220, 01, '** ' . 'Transaction ' . $data_header[0]->tr_name . ' **', 0, 1, 'C');
+                $pdf->Cell(04, 03, "Trx No " . $data_header[0]->tr_number , 0, 1, 'L');
+                $pdf->Cell(04, 03, "Trx Date ". revDate($data_header[0]->tr_date), 0, 1, 'L');
+                $pdf->Ln(1);
+                $pdf->Cell(04, 03, "#", 0, 0, 'L');
+                $pdf->Cell(70, 03, "Product", 0, 0, 'L');
+                $pdf->Cell(20, 03, "Qty", 0, 0, 'L');
+                $pdf->Cell(20, 03, "Price", 0, 0, 'L');
+                $pdf->Cell(40, 03, "Subtotal Rp.", 0, 0, 'L');
+                $pdf->Ln(3);
+                $pdf->Cell(01, 03, "----------------------------------------------------------------------------------------------------------------------", 0, 1, 'L');
+                $product_name = $r->product_name;
+                $qty    = ($r->qty == 'null' || $r->qty == '' ? '' : (float) $r->qty);
+                $price      = ($r->price == 'null' || $r->price == '' ? 0 :  floatval($r->price));
+                $subtotal   = ($qty > 0 ? $qty * $price : 0);
+                $total      = $total + $subtotal;
+                $pdf->Cell(04,03,$no,0,0);
+                $pdf->Cell(70,03,$product_name,0,0);
+                $pdf->Cell(20,03,number_format($qty, "0", ".", ","),0,0);
+                $pdf->Cell(20,03,number_format($price, "0", ".", ","),0,0);
+                $pdf->Cell(40,03,number_format($subtotal, "0", ".", ","),0,0);
+                $pdf->Ln(4);
+            }
+            $pdf->Cell(01, 03, "----------------------------------------------------------------------------------------------------------------------", 0, 1, 'L');            
+            $pdf->Cell(01, 03, 'Grand Total Rp. ' . number_format($total, "0", ".", ","), 0, 1, 'L');   
+            $pdf->Ln(1);
+            $pdf->Cell(60, 03, 'Created by,', 0, 0, 'L');
+            $pdf->Cell(30, 03, 'Approve by,', 0, 1, 'L');
+            $pdf->Output('nota.pdf','I');
+        } else {
+            echo 'data empty';
+        }        
     }
 
 }
