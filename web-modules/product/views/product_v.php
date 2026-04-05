@@ -24,19 +24,13 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="link" class="control-label col-lg-4">UOM</label>
+                                <label class="control-label col-lg-4">Product Category</label>
                                 <div class="col-lg-8">
-                                    <input type="text" id="uom" name="uom" placeholder="Uom..." data-validation="required" class="form-control">
+                                    <input type="text" id="product_category" name="product_category" placeholder="Product Category..." class="form-control">
                                 </div>
-                            </div>                     
+                            </div>                                               
                         </div>
                         <div class="col-lg-6">
-                            <div class="form-group row">
-                                <label for="link" class="control-label col-lg-4">Price</label>
-                                <div class="col-lg-8">
-                                    <input type="text" id="price" name="price" placeholder="Price..." data-validation="required" class="form-control">
-                                </div>
-                            </div>
                             <div class="form-group row">
                                 <label class="control-label col-lg-4">Status</label>
                                 <div>
@@ -71,8 +65,7 @@
                                 <th>#</th>
                                 <th>Product Code</th>
                                 <th>Product Name</th>
-                                <th>UOM</th>
-                                <th>Price</th>
+                                <th>Product Category</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>

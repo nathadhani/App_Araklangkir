@@ -65,8 +65,8 @@ class Product extends App_Controller {
 
     function getproduct() {
         checkIfNotAjax();
-        $this->Appmdl->searchable = array('product_code', 'product_name');
-        $this->Appmdl->select2fields = array('id' => 'id', 'text' => "concat(product_code,' - ',product_name)");
+        $this->Appmdl->searchable = array('product_code', 'product_name', 'product_category');
+        $this->Appmdl->select2fields = array('id' => 'id', 'text' => "concat(product_code,' - ',concat(product_name , ' | ', product_category))");
         $result['results'] = $this->Appmdl->getSelect2(array('status' => '1'));
         $result['more'] = true;
         echo json_encode($result);

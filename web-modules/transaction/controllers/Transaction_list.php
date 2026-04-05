@@ -13,17 +13,12 @@ class Transaction_list extends App_Controller {
         $this->template->build('transaction/transaction_list_v');
     }
 
-    function dbquery($tr_date){
+    function dbquery($tahun,$bulan){
         return $this->db->query("SELECT
                                 tr_header.id AS id,
                                 tr_header.tr_id AS tr_id,
                                 tr_header.tr_date AS tr_date,
                                 tr_header.tr_number AS tr_number,
-                                (
-                                    SELECT sum(tr_detail.qty * tr_detail.price) 
-                                    FROM tr_detail 
-                                    WHERE tr_detail.header_id = tr_header.id                                    
-                                ) AS total,
                                 tr_header.description AS description,
                                 tr_header.status AS status,
                                 tr_header.created AS created,
@@ -60,15 +55,18 @@ class Transaction_list extends App_Controller {
                             FROM tr_header
                             LEFT JOIN users usr1 ON tr_header.createdby = usr1.id						
                             LEFT JOIN users usr2 ON tr_header.updatedby = usr2.id 
-                            WHERE tr_header.tr_date = '$tr_date'
+                            WHERE YEAR(tr_header.tr_date) = $tahun
+                            AND MONTH(tr_header.tr_date) = $bulan
                             ORDER BY tr_header.tr_id ASC, tr_header.tr_number ASC");        
     }
     
     function getdata() {
         checkIfNotAjax();
         $postData = $this->input->post();
-        $tr_date = revDate($postData['tr_date']);
-        echo json_encode($this->dbquery($tr_date)->result(), true);
+        $tahun = intval(SUBSTR($postData['period'],3,4));
+        $bulan = intval(SUBSTR($postData['period'],0,2));        
+        $result = $this->dbquery($tahun,$bulan)->result();
+        echo json_encode($result, true);
     }    
 
 }

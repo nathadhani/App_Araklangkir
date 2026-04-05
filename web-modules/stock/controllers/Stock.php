@@ -69,4 +69,70 @@ class Stock extends App_Controller {
                                     ORDER by tr_header.tr_date,tr_header.tr_id,tr_detail.id ASC")->result();
         echo json_encode($query, true);
     }
+
+    function calculation_stock(){
+        checkIfNotAjax();
+        $postData = $this->input->post();     
+
+        $tahun = (int) date('Y');
+        $bulan = (int) date('m');
+        if(isset($postData['period'])){
+            $tahun = (int) SUBSTR($postData['period'],3,4);
+            $bulan = (int) SUBSTR($postData['period'],0,2);
+        }
+        if(isset($postData['tr_date'])){
+            $tahun = (int) SUBSTR(revDate($postData['tr_date']),0,4);
+            $bulan = (int) SUBSTR(revDate($postData['tr_date']),5,2);
+        }
+        $tahun2 = $tahun;
+        $bulan2 = $bulan + 1;
+        if($bulan == 12){
+            $tahun2 = $tahun + 1;
+            $bulan2 = 1;
+        }
+        
+        $product = $this->db->query("SELECT product.id AS product_id FROM product WHERE status = 1 ORDER BY product.id ASC");
+        if(!empty($product)){
+            // Delete Bulan Berjalan
+            /******************************************************************************************************/
+            $where = array(
+                    'stock_year' => $tahun,
+                    'stock_month' => $bulan
+            );
+            $this->db->trans_begin();            
+            $this->db->delete('stock', $where);
+            // echo $this->db->last_query();exit;
+            if ($this->db->trans_status() === FALSE) {
+                $this->db->trans_rollback();
+                $err = $this->db->error();
+                echo '<br> Delete bulan berjalan : ' . $err['code'] . ' ' . $err['message'];
+            } else {
+                $this->db->trans_commit();
+            }
+
+            // Delete Bulan Berikutnya
+            /******************************************************************************************************/
+            $where = array(
+                    'stock_year' => $tahun2,
+                    'stock_month' => $bulan2
+            );            
+            $this->db->trans_begin();
+            $this->db->delete('stock', $where);
+            // echo $this->db->last_query();exit;
+            if ($this->db->trans_status() === FALSE) {
+                $this->db->trans_rollback();
+                $err = $this->db->error();
+                echo '<br> Delete bulan berikutnya : ' . $err['code'] . ' ' . $err['message'];
+            } else {
+                $this->db->trans_commit();
+            }
+            
+            // Insert dan Update
+            /******************************************************************************************************/
+            foreach($product->result_array() as $row) {
+                $product_id = $row['product_id'];                
+                $this->Appmdl->generate_stock($tahun, $bulan, $product_id);
+            }
+        }
+    }
 }

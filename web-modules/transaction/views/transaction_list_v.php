@@ -16,7 +16,7 @@
                                 <label for="tr_date1" style="display:block">Period</label>
                                 <div class="input-group" style="margin-left:-15px;">
                                     <div class="col-lg-6">
-                                        <input type="text" id="tr_date" name="tr_date" placeholder="Tanggal..." class="form-control dp" data-date-format="DD MMMM YYYY" style="width:120px;" value="<?=date('d-m-Y');?>">                                        
+                                        <input style="width:100px;" type="text" data-inputmask="'mask': '[99-9999]'" class="form-control dpM" placeholder="Periode" name="period" id="period" value="<?=date('m-Y')?>">
                                     </div>
                                     <div class="col-lg-4" style="margin-left:5px;">
                                         <button id="btn-submit" class="btn btn-default" style="width:50px;margin-left:10px;"><i class="fa fa-play"></i></button>
@@ -33,8 +33,8 @@
                             <tr>
                                 <th style="vertical-align:middle;text-align:center;">#</th>    
                                 <th style="vertical-align:middle;text-align:center;">Trx</th>
+                                <th style="vertical-align:middle;text-align:center;">Date</th>
                                 <th style="vertical-align:middle;text-align:center;">Number</th>
-                                <th style="vertical-align:middle;text-align:center;">Rupiah</th>
                                 <th style="vertical-align:middle;text-align:center;">Status</th>
                                 <th style="vertical-align:middle;text-align:center;">Description</th>
                                 <th style="vertical-align:middle;text-align:center;">Created</th>

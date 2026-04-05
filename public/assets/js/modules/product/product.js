@@ -4,8 +4,7 @@ $("#mainForm").submit(function (e) {
     $("#ftitle").html('Add');
     $("#product_code").html('').focus();
     $("#product_name").html('');
-    $("#uom").html('');
-    $("#price").val(0);
+    $("#product_category").html('');
     $("#status").iCheck('check');
 });
 
@@ -65,11 +64,8 @@ t = $('#mainTable').DataTable({
         {data: 'product_name', width: "45%", render: function (data, type, row, meta) {                    
             return data;
         }},
-        {data: 'uom',  width: "8%", render: function (data, type, row, meta) {
+        {data: 'product_category', render: function (data, type, row, meta) {                    
             return data;
-        }},
-        {data: 'price',  width: "10%", render: function (data, type, row, meta) {
-            return formatRupiah(data);
         }},
         {data: 'status', className: "dt-body-center", width: "5%", render: function (data, type, row, meta) {
             var act = (data == '1') ? '<span class="label label-success"><i class="fa fa-check"></i></span>' : '<span class="label label-danger"><i class="fa fa-times"></i></span>';
@@ -91,8 +87,7 @@ $('#mainTable').on('click', 'a[title^=Edit]', function (e) {
     $("#ftitle").html('Edit');
     $("#product_code").val(d.product_code).focus();
     $("#product_name").val(d.product_name);
-    $("#uom").val(d.uom);
-    $("#price").val(d.price);
+    $("#product_category").val(d.product_category);
     $("#status").iCheck(d.status == 1 ? 'check' : 'uncheck');
     $("body").data("id", d.id);
 });

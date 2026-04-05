@@ -278,43 +278,27 @@ class Appmdl extends App_Model {
                                     WHERE stock_year = $tahun1
                                     AND stock_month = $bulan1
                                     AND product_id = $product_id")->result();
-        // echo $this->db->last_query();exit;        
-        $ending_stock = $qlast_stock[0]->ending_stock;  
-        
-        // harga rata2 pembelian bulan berjalan
-        /**********************************************************************************************************************************/
-        $tanggal_awal = date($tgl1,time());
-        $tanggal_akhir = date('Y-m-t',mktime(0, 0, 0, $bulan + 1, 0, $tahun));
-        $maxday = date('d', strtotime($tanggal_akhir));
-        // var_dump($tanggal_awal . ' s/d ' .$tanggal_akhir . ' maxday ' . $maxday);exit;
-        for ($tgl = 1; $tgl <= $maxday; $tgl++) {
-            $tr_date = $tahun.'-'.sprintf("%02d", $bulan).'-'. sprintf("%02d", $tgl);
-            $tr_date_before = date('Y-m-d', strtotime('-1 days', strtotime( $tr_date )));
-            
-            echo $tr_date . ' : ' . $ending_stock. '<br>'; 
+        $ending_stock = ($qlast_stock[0]->ending_stock == null ? 0 : intval($qlast_stock[0]->ending_stock));
 
-            /** Get Transaction IN/OUT*/
-            /***************************************************************************************************************** */
-            $qty_in = 0;
-            $qty_out = 0;
-            $gettrx = $this->db->select('tr_header.tr_date,                                                  
-                                            tr_detail.product_id,
-                                            SUM(IF((tr_header.status = 3 AND ( tr_header.tr_id = 1 )),(tr_detail.qty),0)) AS qty_in,
-                                            SUM(IF((tr_header.status = 3 AND ( tr_header.tr_id = 2 )),(tr_detail.qty),0)) AS qty_out')
-                        ->from('tr_detail')
-                        ->join('tr_header', 'tr_header.id=tr_detail.header_id', 'left')
-                        ->where(array('tr_header.tr_date' => $tr_date, 'tr_detail.product_id' => $product_id))
-                        ->where_in('tr_detail.status', ['3'])
-                        ->group_by('tr_header.tr_date, tr_detail.product_id')->get();
-            if($gettrx->num_rows()){
-                foreach($gettrx->result_array() as $row) {                    
-                    $qty_in = intval($row['qty_in']); 
-                    $qty_out = intval($row['qty_out']); 
-                    $ending_stock = intval(ROUND(($ending_stock + $qty_in - $qty_out),0));                            
-                }                
-            }        
-        }
-
+        /** Get Transaction IN/OUT*/
+        /***************************************************************************************************************** */
+        $qty_in = 0;
+        $qty_out = 0;
+        $gettrx = $this->db->select('tr_detail.product_id,
+                                    SUM(IF((tr_header.status = 3 AND ( tr_header.tr_id = 1 )),(tr_detail.qty),0)) AS qty_in,
+                                    SUM(IF((tr_header.status = 3 AND ( tr_header.tr_id = 2 )),(tr_detail.qty),0)) AS qty_out')
+                    ->from('tr_detail')
+                    ->join('tr_header', 'tr_header.id=tr_detail.header_id', 'left')
+                    ->where(array('YEAR(tr_header.tr_date)' => $tahun, 'MONTH(tr_header.tr_date)' => $bulan, 'tr_detail.product_id' => $product_id))
+                    ->where_in('tr_detail.status', ['1','3'])->get();
+        // echo $this->db->last_query();exit;
+        if($gettrx->num_rows()){
+            foreach($gettrx->result_array() as $row) {
+                $qty_in = $qty_in + intval($row['qty_in']); 
+                $qty_out = $qty_out + intval($row['qty_out']);                 
+            }                
+        }        
+        $ending_stock = intval(ROUND(($ending_stock + $qty_in - $qty_out),0));                            
         $data = array(
                     'ending_stock' => $ending_stock,
                     'updated' => date('Y-m-d H:i:s', time()),
@@ -326,7 +310,6 @@ class Appmdl extends App_Model {
                 'product_id' => $product_id
         );
         $this->db->update('stock', $data, $where);
-        // echo $this->db->last_query();exit;        
         if ($this->db->trans_status() === FALSE) {
             $this->db->trans_rollback();
             $err = $this->db->error();

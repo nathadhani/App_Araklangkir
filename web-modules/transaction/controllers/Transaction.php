@@ -40,7 +40,6 @@ class Transaction extends App_Controller {
                 unset($postData['header_id']);
                 unset($postData['product_id']);
                 unset($postData['qty']);
-                unset($postData['price']);
                 unset($postData['mainTable_length']);
                 if(isset($postData['tr_date'])){
                     $postData['tr_date'] = revDate($postData['tr_date']);
@@ -69,7 +68,6 @@ class Transaction extends App_Controller {
                 unset($postData['header_id']);
                 unset($postData['product_id']);
                 unset($postData['qty']);
-                unset($postData['price']);
                 unset($postData['mainTable_length']);
                 if(isset($postData['tr_date'])){
                     $postData['tr_date'] = revDate($postData['tr_date']);
@@ -102,20 +100,15 @@ class Transaction extends App_Controller {
             unset($postDetail['description']);
             unset($postDetail['mainTable_length']);
             $postDetail['header_id'] = $id_header;
-            if (strpos($postDetail['price'], ',') !== false) {
-                $postDetail['price'] = str_replace(',','.',$postDetail['price']);
-            }        
             $postDetail['status'] = '1';
             $this->Appmdl->table = 'tr_detail';
             $product_id = $postDetail['product_id'];
             $qty = $postDetail['qty'];
-            $price = $postDetail['price'];
             $qstr = "SELECT id, header_id, product_id, qty
                                           FROM tr_detail
                                           WHERE header_id = $id_header 
                                           AND product_id = $product_id
-                                          AND qty = $qty
-                                          AND price = $price";
+                                          AND qty = $qty";
             $cek_detail = $this->db->query($qstr)->result();
             if(empty($cek_detail)){
                 $response = $this->Appmdl->insert($postDetail);
@@ -200,10 +193,7 @@ class Transaction extends App_Controller {
                                                 'Confirm' 
                                             END 
                                         )
-                                    ) AS status_name,
-                                    (
-                                        SELECT COALESCE(sum(tr_detail.qty * tr_detail.price),0) FROM tr_detail WHERE tr_detail.header_id = tr_header.id
-                                    ) AS total
+                                    ) AS status_name
 
                                 FROM tr_header
                                 LEFT JOIN users usr1 ON tr_header.createdby = usr1.id						
@@ -220,15 +210,11 @@ class Transaction extends App_Controller {
         $query = $this->db->query("SELECT tr_detail.id,
                                         product.product_code,
                                         product.product_name,
-                                        product.uom,
-                                        tr_detail.qty,
-                                        tr_detail.price,
-                                        (tr_detail.qty * tr_detail.price) AS subtotal
+                                        tr_detail.qty
                                    FROM tr_detail 
                                    JOIN product ON tr_detail.product_id = product.id
                                    WHERE tr_detail.header_id= " . $header_id ." 
-                                   ORDER BY tr_detail.product_id, tr_detail.price ASC")->result();
-
+                                   ORDER BY tr_detail.product_id ASC")->result();
         echo json_encode($query, true);                
     }
 
@@ -302,6 +288,7 @@ class Transaction extends App_Controller {
                                    AND stock.stock_month = $bulan
                                    AND stock.product_id = $product_id
                                    LIMIT 1")->result();
+        // echo $this->db->last_query();exit;
         echo json_encode($query, true);
     }    
         
@@ -403,10 +390,7 @@ class Transaction extends App_Controller {
                                                 'Confirm' 
                                             END 
                                         )
-                                    ) AS status_name,
-                                    (
-                                        SELECT COALESCE(sum(tr_detail.qty * tr_detail.price),0) FROM tr_detail WHERE tr_detail.header_id = tr_header.id
-                                    ) AS total
+                                    ) AS status_name
 
                                 FROM tr_header
                                 LEFT JOIN users usr1 ON tr_header.createdby = usr1.id						
@@ -415,13 +399,12 @@ class Transaction extends App_Controller {
                                 ORDER BY tr_header.tr_id ASC, tr_header.tr_number ASC LIMIT 1")->result();        
 
         $data_detail = $this->db->query("SELECT CONCAT(product.product_code,' - ',product.product_name) AS product_name,
-                                        SUM(tr_detail.qty) AS qty,
-                                        tr_detail.price
+                                        SUM(tr_detail.qty) AS qty
                                    FROM tr_detail 
                                    JOIN product ON tr_detail.product_id = product.id
                                    WHERE tr_detail.header_id= " . $header_id ." 
-                                   GROUP BY tr_detail.product_id, tr_detail.price
-                                   ORDER BY tr_detail.product_id, tr_detail.price ASC")->result();
+                                   GROUP BY tr_detail.product_id
+                                   ORDER BY tr_detail.product_id ASC")->result();
         $pdf = new Pdf();        
         $pdf->SetPrintHeader(false);
         $pdf->SetPrintFooter(false);
@@ -430,35 +413,27 @@ class Transaction extends App_Controller {
         if(!empty($data_detail)) {
             $no = 0;
             $total = 0;
+            $pdf->Ln(1);
+            $pdf->Cell(220, 01, '** ' . 'Transaction ' . $data_header[0]->tr_name . ' **', 0, 1, 'C');
+            $pdf->Cell(04, 03, "Trx No " . $data_header[0]->tr_number , 0, 1, 'L');
+            $pdf->Cell(04, 03, "Trx Date ". revDate($data_header[0]->tr_date), 0, 1, 'L');
+            $pdf->Ln(1);
+            $pdf->Cell(01, 03, "----------------------------------------------------------------------------------------------------------------------", 0, 1, 'L');
+            $pdf->Cell(04, 03, "#", 0, 0, 'L');
+            $pdf->Cell(70, 03, "Product", 0, 0, 'L');
+            $pdf->Cell(20, 03, "Qty", 0, 0, 'L');
+            $pdf->Ln(3);
+            $pdf->Cell(01, 03, "----------------------------------------------------------------------------------------------------------------------", 0, 1, 'L');
             foreach($data_detail as $r){
                 $no++;                
-                $pdf->Ln(1);
-                $pdf->Cell(220, 01, '** ' . 'Transaction ' . $data_header[0]->tr_name . ' **', 0, 1, 'C');
-                $pdf->Cell(04, 03, "Trx No " . $data_header[0]->tr_number , 0, 1, 'L');
-                $pdf->Cell(04, 03, "Trx Date ". revDate($data_header[0]->tr_date), 0, 1, 'L');
-                $pdf->Ln(1);
-                $pdf->Cell(04, 03, "#", 0, 0, 'L');
-                $pdf->Cell(70, 03, "Product", 0, 0, 'L');
-                $pdf->Cell(20, 03, "Qty", 0, 0, 'L');
-                $pdf->Cell(20, 03, "Price", 0, 0, 'L');
-                $pdf->Cell(40, 03, "Subtotal Rp.", 0, 0, 'L');
-                $pdf->Ln(3);
-                $pdf->Cell(01, 03, "----------------------------------------------------------------------------------------------------------------------", 0, 1, 'L');
                 $product_name = $r->product_name;
                 $qty    = ($r->qty == 'null' || $r->qty == '' ? '' : (float) $r->qty);
-                $price      = ($r->price == 'null' || $r->price == '' ? 0 :  floatval($r->price));
-                $subtotal   = ($qty > 0 ? $qty * $price : 0);
-                $total      = $total + $subtotal;
                 $pdf->Cell(04,03,$no,0,0);
                 $pdf->Cell(70,03,$product_name,0,0);
                 $pdf->Cell(20,03,number_format($qty, "0", ".", ","),0,0);
-                $pdf->Cell(20,03,number_format($price, "0", ".", ","),0,0);
-                $pdf->Cell(40,03,number_format($subtotal, "0", ".", ","),0,0);
                 $pdf->Ln(4);
             }
             $pdf->Cell(01, 03, "----------------------------------------------------------------------------------------------------------------------", 0, 1, 'L');            
-            $pdf->Cell(01, 03, 'Grand Total Rp. ' . number_format($total, "0", ".", ","), 0, 1, 'L');   
-            $pdf->Ln(1);
             $pdf->Cell(60, 03, 'Created by,', 0, 0, 'L');
             $pdf->Cell(30, 03, 'Approve by,', 0, 1, 'L');
             $pdf->Output('nota.pdf','I');

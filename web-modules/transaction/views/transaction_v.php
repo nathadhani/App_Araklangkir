@@ -50,12 +50,6 @@
                                     <input type="text" id="description" name="description" placeholder="Description..." data-validation="required" class="form-control">
                                 </div>
                             </div>
-                            <div class="form-group row">
-                                <label class="control-label col-lg-4">Total Rp.</label>
-                                <div class="col-lg-8">
-                                    <span id="total_transaksi"></span>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -68,7 +62,7 @@
                 </div>
                 <div class="panel-body">                    
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-group row">
                                 <label for="product_id" class="control-label col-lg-4">Select Product</label>
                                 <div class="col-lg-8">
@@ -83,29 +77,23 @@
                                             class='form-control select2'
                                             require
                                     >
-                                    </select>
+                                    </select>                                    
                                 </div>
                             </div>
+                            <div class="form-group row">
+                                <label for="qty_stock" class="control-label col-lg-4">Stock</label>
+                                <div class="col-lg-8">
+                                    <input type="text" id="qty_stock" class="form-control" value="0" readonly>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="col-md-2">
                             <div class="form-group row">
                                 <label for="qty" class="control-label col-lg-4">Qty</label>
                                 <div class="col-lg-8">
                                     <input type="text" onkeypress="validasiAngka(event)" autofocuse="" id="qty" name="qty" class="form-control">
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group row">
-                                <label for="price" class="control-label col-lg-4">Price</label>
-                                <div class="col-lg-8">                                    
-                                    <input type="text" onkeypress="validasiAngka(event)" autofocuse="" id="price" name="price" class="form-control">
-                                </div>                                
-                            </div>
-                            <div class="form-group row">
-                                <label for="" class="control-label col-lg-4">Subtotal</label>                       
-                                <div class="col-lg-8">
-                                    <input type="text" autofocuse="" id="subtotal" class="form-control" value="0" readonly>                                    
-                                </div>                                
-                            </div>                            
                         </div>
                         <div class="col-md-4">
                             <button id="btn-add-detail" class="btn btn-default" style="width:50px;"><i class="fa fa-plus"></i></button>
@@ -122,8 +110,6 @@
                                         <th style='vertical-align:middle;text-align:center;'>#</th>
                                         <th style='vertical-align:middle;text-align:left;'>Product</th>
                                         <th style='vertical-align:middle;text-align:left;'>Qty</th>
-                                        <th style='vertical-align:middle;text-align:left;'>Price</th>
-                                        <th style='vertical-align:middle;text-align:left;'>Subtotal</th>
                                         <th style='vertical-align:middle;text-align:left;'>Action</th>
                                     </tr>
                                 </thead>

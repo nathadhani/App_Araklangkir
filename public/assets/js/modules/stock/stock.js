@@ -1,3 +1,27 @@
+$("#btn-calculate").on('click', function (e) {
+    e.preventDefault();
+    $.ajax({
+        url: baseUrl + 'stock/stock/calculation_stock',
+        type: 'POST',
+        beforeSend: function(){
+            $(".ajax-loader").height($(document).height());
+            $('.ajax-loader').css("visibility", "visible");
+        },
+        data: {'period' : $('#period').val()},
+        datatype: 'json',
+        success: function(data){
+            alertify.success('Calculate stock done.!');                
+        },
+        complete: function(){
+            $('.ajax-loader').css("visibility", "hidden");
+        },
+        error: function(xhr){
+            $('.ajax-loader').css("visibility", "hidden");
+            alertify.error("error calculate stock.!");
+        }
+    });
+});
+
 $("#btn-submit").on('click', function (e) {
     e.preventDefault();
     if($('#product_id').val() === null || $('#product_id').val() === ''){
@@ -40,7 +64,7 @@ $("#btn-submit").on('click', function (e) {
                                 if(Number(d.status) === 1){
                                     $description = d.description + ' / Task';
                                 }                                
-                                if(Number(d.status) !== 2){                                
+                                if(Number(d.status) === 3){                                
                                     $saldo = ($saldo +  Number(d.qty_in)) - Number(d.qty_out);
                                 }                                
                                 var rows =`<tr style="vertical-align:middle">

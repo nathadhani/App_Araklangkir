@@ -17,7 +17,7 @@ function fetch_data(){
         ajax: {
             url: baseUrl + 'transaction/transaction_list/getdata',
             type: 'POST',
-            data: {'tr_date' : $("#tr_date").val()},
+            data: {'period' : $('#period').val()},
             dataSrc: ""
         },
         columns: [
@@ -27,16 +27,16 @@ function fetch_data(){
             {data: 'tr_name', width: "5%", render: function (data, type, row, meta) {                    
                 return data;
             }},
+            {data: 'tr_date',  width: "10%", render: function (data, type, row, meta) {
+                return bksfn.revDate(data);
+            }},
             {data: 'tr_number',  width: "11%", render: function (data, type, row, meta) {
                 return data
-            }},
-            {data: 'total',  width: "10%", render: function (data, type, row, meta) {
-                return formatRupiah(data)
             }},
             {data: 'status_name',  width: "10%", render: function (data, type, row, meta) {
                 return data;
             }},
-            {data: 'description', width: "25%", render: function (data, type, row, meta) {                    
+            {data: 'description', width: "15%", render: function (data, type, row, meta) {                    
                 return data;
             }},
             {data: 'created', width: "15%", render: function (data, type, row, meta) {                    
